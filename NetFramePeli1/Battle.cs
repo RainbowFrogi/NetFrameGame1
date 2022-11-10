@@ -99,6 +99,7 @@ namespace NetFramePeli1
 
                 PrintStatus();
                 PrintMessage();
+                PrintHistory();
 
                 Console.WriteLine("OLD THINGS DOWN FROM HERE");
 
@@ -163,6 +164,8 @@ namespace NetFramePeli1
                 #endregion
 
                 Undo();
+                enemySelection = -1;
+                mySelection = -1;
             }
         }
 
@@ -228,7 +231,7 @@ namespace NetFramePeli1
         }
         public void PrintHistory()
         {
-
+            Console.WriteLine("[------------------------ History --------------------------------]");
         }
         
         public void AiTurn()
