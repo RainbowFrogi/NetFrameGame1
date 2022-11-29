@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using System.Security.Cryptography;
-using static System.Net.Mime.MediaTypeNames;
+﻿
 
 namespace NetFramePeli1
 {
@@ -50,9 +48,10 @@ namespace NetFramePeli1
                     WriteLine(round.ToString(), ConsoleColor.Yellow);
                     Console.WriteLine();
                 }
-                round++;
+                else round++;
+                //round++;
                 
-                
+                    
                 /*Console.WriteLine("Player's turn: Choose a unit by giving a number:");
 
                 //FriendlyPrinting
@@ -80,13 +79,29 @@ namespace NetFramePeli1
                     ConsoleKeyInfo UserInput = Console.ReadKey();
                     hold = keyToNumber(UserInput.Key.ToString());
 
+                    if (myTeam[0].attacked && myTeam[1].attacked && myTeam[2].attacked)
+                    {
+                        myTeam[0].attacked = false;
+                        myTeam[1].attacked = false;
+                        myTeam[2].attacked = false;
+                        round++;
+                    }
+
+
                     if (hold != -1)
                     {
                         mySelection = hold;
 
                         if (mySelection >= 0 && mySelection <= myTeam.Length - 1)
                         {
-                            if (!myTeam[mySelection].isAlive) WriteLine("Selected unit is not alive, try another one!", ConsoleColor.DarkRed);
+                            if (!myTeam[mySelection].isAlive)
+                            {
+                                WriteLine("Selected unit is not alive, try another one!", ConsoleColor.DarkRed);
+                            }
+                            else if (myTeam[mySelection].attacked == true)
+                            {
+                                WriteLine("Selected unit has already attacked this round!", ConsoleColor.DarkRed);
+                            }
                             else break;
                         }
                         else WriteLine("Selected unit doesn't exist", ConsoleColor.DarkRed);
@@ -103,23 +118,6 @@ namespace NetFramePeli1
                 PrintMessage();
                 PrintHistory();
 
-                /*Console.WriteLine("OLD THINGS DOWN FROM HERE");
-
-                Console.WriteLine("");
-                Console.WriteLine("Choose target from enemy team:");
-
-                //EnemyPrinting
-                for (int i = 0; i < enemyTeam.Length; i++)
-                {
-                    if (enemyTeam[i].isAlive)
-                    {
-                        Write($"{i}: {enemyTeam[i].name}", ConsoleColor.DarkYellow);
-                        WriteLine($"|{enemyTeam[i].HP.ToString()} HP", ConsoleColor.Red);
-                    }
-                    else WriteLine($"{i}: {enemyTeam[i].name}", ConsoleColor.Red);
-                }
-                Console.WriteLine();*/
-
                 //EnemySelection
                 while (true)
                 {
@@ -130,6 +128,7 @@ namespace NetFramePeli1
                     ConsoleKeyInfo UserInput = Console.ReadKey();
                     hold = keyToNumber(UserInput.Key.ToString());
 
+                    
                     if (hold != -1)
                     {
                         enemySelection = hold;
@@ -147,6 +146,7 @@ namespace NetFramePeli1
                 //Attack
                 #region printAttacks
                 enemyTeam[enemySelection].Damage(myTeam[mySelection].damage);
+                myTeam[mySelection].attacked = true;
                 WriteLine();
                 WriteLine("YOU ATTACK:", ConsoleColor.Blue);
                 Write(new Text(myTeam[mySelection].name, ConsoleColor.DarkCyan), new Text(" attacked "), new Text(enemyTeam[enemySelection].name, ConsoleColor.DarkYellow), new Text(", for "), new Text(myTeam[mySelection].damage.ToString(), ConsoleColor.Red), new Text(" damage!"));
@@ -164,12 +164,13 @@ namespace NetFramePeli1
                     break;
                 }
                 #endregion
-
-                Undo();
+                //Undo();
+                AiTurn();
                 enemySelection = -1;
                 mySelection = -1;
             }
         }
+        
 
         public void PrintStatus()
         {
@@ -204,7 +205,7 @@ namespace NetFramePeli1
                 if (!enemyTeam[i].isAlive)
                 {
                     Console.SetCursorPosition(25, i + addRows);
-                    WriteLine($"{i}) {enemyTeam[i].name} | {myTeam[i].HP}", ConsoleColor.DarkRed);
+                    WriteLine($"{i}) {enemyTeam[i].name} | {enemyTeam[i].HP}", ConsoleColor.DarkRed);
                 }
                 else if (enemyTeam[i].isAlive && enemySelection == i)
                 {

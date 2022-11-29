@@ -8,19 +8,19 @@
     "net6.0": []
   },
   "packageFolders": {
-    "C:\\Users\\anton\\.nuget\\packages\\": {}
+    "C:\\Users\\s2000956\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\anton\\source\\repos\\NetFramePeli1\\NetFramePeli1\\NetFramePeli1.csproj",
+      "projectUniqueName": "C:\\Users\\s2000956\\source\\repos\\NetFramePeli1\\NetFramePeli1\\NetFramePeli1.csproj",
       "projectName": "NetFramePeli1",
-      "projectPath": "C:\\Users\\anton\\source\\repos\\NetFramePeli1\\NetFramePeli1\\NetFramePeli1.csproj",
-      "packagesPath": "C:\\Users\\anton\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\anton\\source\\repos\\NetFramePeli1\\NetFramePeli1\\obj\\",
+      "projectPath": "C:\\Users\\s2000956\\source\\repos\\NetFramePeli1\\NetFramePeli1\\NetFramePeli1.csproj",
+      "packagesPath": "C:\\Users\\s2000956\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\s2000956\\source\\repos\\NetFramePeli1\\NetFramePeli1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\anton\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\s2000956\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -61,7 +61,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.402\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

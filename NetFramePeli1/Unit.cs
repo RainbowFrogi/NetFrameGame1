@@ -6,8 +6,9 @@
         public int HP;
         public int damage;
         public bool isAlive = true;
+        public bool attacked = false;
 
-        public Unit(string name, int HP, int damage, attasssvbgg)
+        public Unit(string name, int HP, int damage)
         {
             this.name = name;
             this.HP = HP;
