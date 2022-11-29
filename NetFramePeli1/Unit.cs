@@ -7,7 +7,7 @@
         public int damage;
         public bool isAlive = true;
 
-        public Unit(string name, int HP, int damage)
+        public Unit(string name, int HP, int damage, attasssvbgg)
         {
             this.name = name;
             this.HP = HP;

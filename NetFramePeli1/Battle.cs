@@ -32,6 +32,8 @@ namespace NetFramePeli1
 
             rng = new Random();
 
+            
+
             BattleLogic();
         }
 
@@ -71,7 +73,7 @@ namespace NetFramePeli1
                 //FriendlySelection
                 while (true)
                 {
-                    Console.Write("Give a number: ");
+                    Console.Write("Select a unit: ");
                     mySelection = -1;
                     hold = -1;
 
@@ -101,7 +103,7 @@ namespace NetFramePeli1
                 PrintMessage();
                 PrintHistory();
 
-                Console.WriteLine("OLD THINGS DOWN FROM HERE");
+                /*Console.WriteLine("OLD THINGS DOWN FROM HERE");
 
                 Console.WriteLine("");
                 Console.WriteLine("Choose target from enemy team:");
@@ -116,7 +118,7 @@ namespace NetFramePeli1
                     }
                     else WriteLine($"{i}: {enemyTeam[i].name}", ConsoleColor.Red);
                 }
-                Console.WriteLine();
+                Console.WriteLine();*/
 
                 //EnemySelection
                 while (true)
@@ -192,9 +194,6 @@ namespace NetFramePeli1
                     WriteLine($"{myTeam[i].HP}", ConsoleColor.DarkRed);
                 }
             }
-
-            //WriteAt("Enemy Army", 20, 5, ConsoleColor.DarkRed);
-            //Console.ResetColor();
 
             Console.SetCursorPosition(25, 3);
             WriteLine("Enemy Army", ConsoleColor.DarkRed);
