@@ -1,6 +1,6 @@
 ﻿namespace NetFramePeli1
 {
-    public struct Unit
+    public class Unit
     {
         public string name;
         public int HP;
@@ -19,14 +19,14 @@
         {
             HP -= dealtDamage;
 
-            isAlive = HP > 0 ? true : false;
+            isAlive = HP > 0;
         }
 
         public void Heal(int healAmount)
         {
             HP += healAmount;
 
-            isAlive = HP > 0 ? true : false;
+            isAlive = HP > 0;
         }
     }
 }

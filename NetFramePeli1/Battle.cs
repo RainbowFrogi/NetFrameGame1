@@ -1,4 +1,4 @@
-﻿
+﻿using System.Diagnostics;
 
 namespace NetFramePeli1
 {
@@ -7,41 +7,51 @@ namespace NetFramePeli1
         Unit[] myTeam = new Unit[3];
         Unit[] enemyTeam = new Unit[3];
 
+        public List<Attacks> attacksList { get; private set; }
+
         Random rng;
 
         public int mySelection = -1;
         public int enemySelection = -1;
         public int round = 0;
         public int hold = -1;
+        public bool canUndo = false;
         public bool unitSelected = false;
+
+        //Initializes the battle and creates the units and assigns them to their righ indexes
         public void InitBattle()
         {
-            Unit scubaDiver = new Unit("Scuba Diver", 200, 20);
+            Unit scubaDiver1 = new Unit("Scuba Diver", 200, 20);
+            Unit scubaDiver2 = new Unit("Scuba Diver", 200, 20);
             Unit DiveOfficer = new Unit("Dive Officer", 200, 25);
-            Unit Shark = new Unit("Shark", 100, 15);
+            Unit Shark1 = new Unit("Shark", 100, 15);
+            Unit Shark2 = new Unit("Shark", 100, 15);
             Unit Kraken = new Unit("Kraken", 300, 8);
 
-            myTeam[0] = scubaDiver;
-            myTeam[1] = scubaDiver;
+            myTeam[0] = scubaDiver1;
+            myTeam[1] = scubaDiver2;
             myTeam[2] = DiveOfficer;
-            enemyTeam[0] = Shark;
-            enemyTeam[1] = Shark;
+            enemyTeam[0] = Shark1;
+            enemyTeam[1] = Shark2;
             enemyTeam[2] = Kraken;
 
             rng = new Random();
 
-            
+            attacksList = new List<Attacks>();
 
+            //Start running battle logic, which runs until the end of the game
             BattleLogic();
         }
 
         public void BattleLogic()
         {
-            WriteLine("Battle begins!\n", ConsoleColor.DarkRed);
-            //PrintTeams();
-
+            //Run as long as there are players alive
             while (true)
             {
+                Console.Clear();
+
+                //if it's the firs round, write the starting message, else write the round number
+                if (round == 0) WriteLine("Battle begins!\n", ConsoleColor.DarkRed);
                 if (round != 0)
                 {
                     Write($"Round ");
@@ -49,23 +59,8 @@ namespace NetFramePeli1
                     Console.WriteLine();
                 }
                 else round++;
-                //round++;
-                
-                    
-                /*Console.WriteLine("Player's turn: Choose a unit by giving a number:");
 
-                //FriendlyPrinting
-                for (int i = 0; i < myTeam.Length; i++)
-                {
-                    if (myTeam[i].isAlive)
-                    {
-                        Write($"{i}: {myTeam[i].name}", ConsoleColor.DarkCyan);
-                        WriteLine($"|{myTeam[i].HP.ToString()} HP", ConsoleColor.Red);
-                    }
-                    else WriteLine($"{i}: {myTeam[i].name}", ConsoleColor.Red);
-                }
-                Console.WriteLine();*/
-
+                //Print the teams
                 PrintStatus();
                 PrintMessage();
 
@@ -76,9 +71,11 @@ namespace NetFramePeli1
                     mySelection = -1;
                     hold = -1;
 
+                    
                     ConsoleKeyInfo UserInput = Console.ReadKey();
                     hold = keyToNumber(UserInput.Key.ToString());
 
+                    //If all the units in my team have attacked, set the attacked boolean to false
                     if (myTeam[0].attacked && myTeam[1].attacked && myTeam[2].attacked)
                     {
                         myTeam[0].attacked = false;
@@ -97,7 +94,7 @@ namespace NetFramePeli1
                             if (!myTeam[mySelection].isAlive)
                             {
                                 WriteLine("Selected unit is not alive, try another one!", ConsoleColor.DarkRed);
-                            }
+                           }
                             else if (myTeam[mySelection].attacked == true)
                             {
                                 WriteLine("Selected unit has already attacked this round!", ConsoleColor.DarkRed);
@@ -116,7 +113,6 @@ namespace NetFramePeli1
 
                 PrintStatus();
                 PrintMessage();
-                PrintHistory();
 
                 //EnemySelection
                 while (true)
@@ -143,41 +139,63 @@ namespace NetFramePeli1
                     else WriteLine("Input was not a number", ConsoleColor.DarkRed);
                 }
 
+                Console.WriteLine();
+
                 //Attack
                 #region printAttacks
-                enemyTeam[enemySelection].Damage(myTeam[mySelection].damage);
-                myTeam[mySelection].attacked = true;
+                Attack();
                 WriteLine();
                 WriteLine("YOU ATTACK:", ConsoleColor.Blue);
                 Write(new Text(myTeam[mySelection].name, ConsoleColor.DarkCyan), new Text(" attacked "), new Text(enemyTeam[enemySelection].name, ConsoleColor.DarkYellow), new Text(", for "), new Text(myTeam[mySelection].damage.ToString(), ConsoleColor.Red), new Text(" damage!"));
                 WriteLine();
                 #endregion
+
+                //AI's turn to attack
+                AiTurn();
+                Console.WriteLine();
+
+                //Print the attack history
+                PrintHistory();
+
+                //Check if there are any units alive in any team
                 #region aliveCheck
-                if (!myTeam[0].isAlive && !myTeam[1].isAlive)
+                if (!myTeam[0].isAlive && !myTeam[1].isAlive && !myTeam[2].isAlive)
                 {
                     BattleEnd(1);
                     break;
                 }
-                else if (!enemyTeam[0].isAlive && !enemyTeam[1].isAlive)
+                else if (!enemyTeam[0].isAlive && !enemyTeam[1].isAlive && !enemyTeam[2].isAlive)
                 {
                     BattleEnd(2);
                     break;
                 }
+
+
                 #endregion
-                //Undo();
-                AiTurn();
+                canUndo = true;
+
+                //Ask, if the user wants to Undo his attack
+                Undo();
+
+                //Reset the Unit Selection variables
                 enemySelection = -1;
                 mySelection = -1;
             }
         }
-        
 
+        //Adds the attack to the attacksList
+        public void Attack()
+        {
+            Attacks action = new Attacks(myTeam[mySelection], enemyTeam[enemySelection]);
+            action.Attack();
+            attacksList.Add(action);
+        }
+
+        //Prints the game status(player and enemy armies)
         public void PrintStatus()
         {
-
             Console.WriteLine("[------------------------ Status ---------------------------------]");
             WriteLine("Player Army", ConsoleColor.DarkBlue);
-            //mySelection = -1;
             for (int i = 0; i < myTeam.Length; i++)
             {
                 if (!myTeam[i].isAlive)
@@ -199,7 +217,6 @@ namespace NetFramePeli1
             Console.SetCursorPosition(25, 3);
             WriteLine("Enemy Army", ConsoleColor.DarkRed);
             int addRows = 4;
-            //enemySelection = -1;
             for (int i = 0; i < enemyTeam.Length; i++)
             {
                 if (!enemyTeam[i].isAlive)
@@ -222,6 +239,8 @@ namespace NetFramePeli1
             }
             Console.SetCursorPosition(0, 7);
         }
+        
+        //Prints the game message(The action you have to do)
         public void PrintMessage()
         {
             Console.WriteLine("[------------------------ Message --------------------------------]");
@@ -229,40 +248,53 @@ namespace NetFramePeli1
             if (!unitSelected) WriteLine("Select unit from team (0-2)");
             else WriteLine("Select target (0-2)");
         }
+        
+        //Prints the history(previously done attacks)
         public void PrintHistory()
         {
+            Console.SetCursorPosition(0, 17);
             Console.WriteLine("[------------------------ History --------------------------------]");
+            //Checks through all the actions in the List<Attacks> and prints the attacks for everyone of them
+            foreach (Attacks action in attacksList)
+            {
+                //Checks if the attack was done by friendly army, and if it was write in Blue and if not write in Red
+                if (action.ReturnTeam() == "Friendly") WriteLine(action.PrintAttack(), ConsoleColor.Blue);
+                else WriteLine(action.PrintAttack(), ConsoleColor.Red);
+            }
         }
         
+        //AI selects and attacks the target
         public void AiTurn()
         {
             WriteLine("AI ATTACKS: ", ConsoleColor.DarkRed);
 
+            //Get random int between 0 and 2 representing the Units index
             int AIUnit = rng.Next(0, enemyTeam.Length);
             int AITarget = rng.Next(0, myTeam.Length);
 
             while (true)
             {
+                //Check if the enemy own unit selection is alive, and if not, get random int again
                 if (!enemyTeam[AIUnit].isAlive) AIUnit = rng.Next(0, enemyTeam.Length);
 
+                //Check if the enemy target unit selection is alive, and if not, get random int again
                 if (!myTeam[AITarget].isAlive) AITarget = rng.Next(0, myTeam.Length);
 
+                //If both, the target and the own unit are alive, attack
                 if (myTeam[AITarget].isAlive && enemyTeam[AIUnit].isAlive)
                 {
-                    myTeam[AITarget].Damage(enemyTeam[AIUnit].damage);
-
+                    Attacks action = new Attacks(enemyTeam[AIUnit], myTeam[AITarget]);
+                    action.Attack();
+                    attacksList.Add(action);
                     break;
                 }
             }
             
             Write(new Text(enemyTeam[AIUnit].name, ConsoleColor.DarkYellow), new Text(" attacked "), new Text(myTeam[AITarget].name, ConsoleColor.DarkCyan), new Text(", for "), new Text(enemyTeam[AIUnit].damage.ToString(), ConsoleColor.Red), new Text(" damage"));
             Console.WriteLine();
-
-            Console.WriteLine("Press any key to advance to the next round");
-            Console.ReadKey();
-            Console.Clear();
         }
 
+        //Prints the team that has won
         public void BattleEnd(int teamWon)
         {
             int unitsAlive = 0;
@@ -287,12 +319,15 @@ namespace NetFramePeli1
             }
         }
 
+        //Console.Write, but the color is changeable
         public void Write(string text = "", ConsoleColor color = ConsoleColor.White)
         {
             Console.ForegroundColor = color;
             Console.Write(text);
             Console.ResetColor();
         }
+
+        //Console.Write, but writes it with green Background color
         public void WriteGreenBG(string text = "", ConsoleColor color = ConsoleColor.White)
         {
             Console.ForegroundColor = color;
@@ -302,6 +337,7 @@ namespace NetFramePeli1
             Console.ResetColor();
         }
 
+        //Console.WriteLine, but the color is changeable
         public void WriteLine(string text = "", ConsoleColor color = ConsoleColor.White)
         {
             Console.ForegroundColor = color;
@@ -309,6 +345,7 @@ namespace NetFramePeli1
             Console.ResetColor();
         }
 
+        //Console.WriteLine, but writes it with green Background color
         public void WriteLineGreenBG(string text = "", ConsoleColor color = ConsoleColor.White, int jee = 3)
         {
             Console.ForegroundColor = color;
@@ -317,6 +354,7 @@ namespace NetFramePeli1
             Console.BackgroundColor = ConsoleColor.White;
             Console.ResetColor();
         }
+
 
         public void Write(params Text[] texts)
         {
@@ -329,34 +367,41 @@ namespace NetFramePeli1
             Console.WriteLine();
         }
 
+        
         public void Undo()
         {
-            Console.WriteLine("Write 'undo', if you want to undo the attack!");
-            if (Console.ReadLine() == "undo")
+            while(true)
             {
-                enemyTeam[enemySelection].Heal(myTeam[mySelection].damage);
-                WriteLine();
-                WriteLine("Undid the last attack!", ConsoleColor.DarkRed);
-                WriteLine();
-                round--;
-                Console.WriteLine("Press any key to advance to the next round");
-                Console.ReadKey();
-                Console.Clear();
+                WriteLine("Press ctrl + z to undo, or press enter to continue", ConsoleColor.DarkRed);
+                if (attacksList.Count < 1) break;
+
+                int lastIndex = attacksList.Count - 1;
+
+                // Read the key that the user has pressed
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                // Check if the Ctrl+Z key combination has been pressed
+                if (keyInfo.Modifiers == ConsoleModifiers.Control && keyInfo.Key == ConsoleKey.Z)
+                {
+                    // Ctrl+Z has been pressed, so do something here
+
+                    //Console.WriteLine("Ctrl + z was pressed");
+
+                    attacksList[lastIndex].UndoAttack();
+                    attacksList.RemoveAt(lastIndex);
+                    lastIndex--;
+                    attacksList[lastIndex].UndoAttack();
+                    attacksList.RemoveAt(lastIndex);
+
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    break;
+                }
             }
-            //AiTurn();
-            else AiTurn();
-            #region aliveCheck
-            if (!myTeam[0].isAlive && !myTeam[1].isAlive)
-            {
-                BattleEnd(1);
-            }
-            else if (!enemyTeam[0].isAlive && !enemyTeam[1].isAlive)
-            {
-                BattleEnd(2);
-            }
-            #endregion
         }
 
+        //Turns the ConsoleKeyInfo into an integer
         public static int keyToNumber(string key)
         {
             if (key.Length == 1) return -1;
@@ -379,19 +424,5 @@ namespace NetFramePeli1
             return -1;
         }
 
-        /*public static void WriteAt(string s, int x, int y, ConsoleColor color = ConsoleColor.White)
-        {
-            try
-            {
-                Console.ForegroundColor = color;
-                Console.SetCursorPosition(origCol + x, origRow + y);
-                Console.Write(s);
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                Console.Clear();
-                Console.WriteLine(e.Message);
-            }
-        }*/
     }
 }
